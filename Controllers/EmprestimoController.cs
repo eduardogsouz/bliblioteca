@@ -1,8 +1,9 @@
+using System;
 using Biblioteca.Models;
+using System.Collections.Generic;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Http;
-using System;
 
 namespace Biblioteca.Controllers
 {
@@ -11,6 +12,7 @@ namespace Biblioteca.Controllers
     {
         public IActionResult Cadastro()
         {
+            Autenticacao.CheckLogin(this);
             LivroService livroService = new LivroService();
             EmprestimoService emprestimoService = new EmprestimoService();
 
@@ -35,18 +37,25 @@ namespace Biblioteca.Controllers
             return RedirectToAction("Listagem");
         }
 
-        public IActionResult Listagem(string tipoFiltro, string filtro)
+        public IActionResult Listagem(string TipoFiltro, string Filtro, int p = 1)
         {
+            Autenticacao.CheckLogin(this);
             FiltrosEmprestimos objFiltro = null;
-            if(!string.IsNullOrEmpty(filtro))
+            if(!string.IsNullOrEmpty(Filtro))
             {
                 objFiltro = new FiltrosEmprestimos();
-                objFiltro.Filtro = filtro;
-                objFiltro.TipoFiltro = tipoFiltro;
+                objFiltro.Filtro = Filtro;
+                objFiltro.TipoFiltro = TipoFiltro;
             }
-            EmprestimoService emprestimoService = new EmprestimoService();
-            return View(emprestimoService.ListarTodos(objFiltro));
+
+            int quantidadePorPagina = 10;
+            EmprestimoService emprestimo = new EmprestimoService();
+            int totalDeRegistro = emprestimo.NumeroDeEmprestimos();
+            ICollection<Emprestimo> listaem = emprestimo.ListarTodos(p, quantidadePorPagina, objFiltro);
+            ViewData["NroPaginas"] = (int) Math.Ceiling((double) totalDeRegistro / quantidadePorPagina);
+            return View(listaem);
         }
+        
 
         public IActionResult Edicao(int id)
         {

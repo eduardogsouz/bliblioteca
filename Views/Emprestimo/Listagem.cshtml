@@ -22,7 +22,10 @@
 
 <div class="row">
     <div class="col-md-12">
-        <table > 
+        @if (Model.Count > 0)
+        {
+        <table class="table table-striped"> 
+
             <thead>
                 <tr><th>Id</th>
                 <th>Usuario</th>
@@ -30,24 +33,50 @@
                 <th>Data Devolução</th>
                 <th>Livro</th>
                 <th>Autor</th>
-                <th></th>
+                <th>Devolvido</th>
                 </tr>
             </thead>
             <tbody>
                 @foreach(Emprestimo e in Model)
                 {
-                <tr>
+                @if (e.Devolvido == false)
+                {
+                <tr class="table-danger">
                     <td>@e.Id</td>
                     <td>@e.NomeUsuario</td>
                     <td>@e.DataEmprestimo.ToString("dd/MM/yyyy")</td>
                     <td>@e.DataDevolucao.ToString("dd/MM/yyyy")</td>
                     <td>@e.Livro.Titulo</td>
                     <td>@e.Livro.Autor</td>
+                    <td>@e.Devolvido</td>
+                    <td><a href="/Emprestimo/Edicao/@e.Id">Editar</a></td>
+                </tr>
+                } else
+                {
+                <tr class="table-success">
+                    <td>@e.Id</td>
+                    <td>@e.NomeUsuario</td>
+                    <td>@e.DataEmprestimo.ToString("dd/MM/yyyy")</td>
+                    <td>@e.DataDevolucao.ToString("dd/MM/yyyy")</td>
+                    <td>@e.Livro.Titulo</td>
+                    <td>@e.Livro.Autor</td>
+                    <td>@e.Devolvido</td>
                     <td><a href="/Emprestimo/Edicao/@e.Id">Editar</a></td>
                 </tr>
                 }
+                }
             </tbody>
         </table>
+        }
+        else
+        {
+            <p>Nenhum registro foi encontrado!!</p>
+        }
+
+        @for(int i = 1; i <= (int)ViewData["NroPaginas"]; i++)
+        {
+            <a class="btn btn-success" href="Listagem?p=1">Pagina @i</a>
+        }
     </div>
 </div>
 
